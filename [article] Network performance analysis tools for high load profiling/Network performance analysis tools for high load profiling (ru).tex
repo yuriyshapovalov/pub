@@ -1,0 +1,126 @@
+
+\documentclass[twocolumn]{article}
+
+\usepackage[english,russian]{babel}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{kurier}
+
+\pagestyle{empty}
+
+%set dimensions of columns, gap between columns, and space between paragraphs
+\setlength{\textheight}{8.75in}
+\setlength{\columnsep}{2.0pc}
+\setlength{\textwidth}{6.8in}
+\setlength{\topmargin}{0.25in}
+\setlength{\headheight}{0.0in}
+\setlength{\headsep}{0.0in}
+\setlength{\oddsidemargin}{-.19in}
+\setlength{\parindent}{1pc}
+
+\makeatletter
+%as Latex considers descenders in its calculation of interline spacing,
+%to get 12 point spacing for normalsize text, must set it to 10 points
+\def\@normalsize{\@setsize\normalsize{12pt}\xpt\@xpt
+\abovedisplayskip 10pt plus2pt minus5pt\belowdisplayskip \abovedisplayskip
+\abovedisplay\texttt{s}hortskip \z@ plus3pt\belowdisplayshortskip 6pt plus3pt
+minus3pt\let\@listi\@listI} 
+
+%need an 11 pt font size for subsection and abstract headings
+\def\subsize{\@setsize\subsize{12pt}\xipt\@xipt}
+
+%make section titles bold and 12 point, 2 blank lines before, 1 after
+\def\section{\@startsection {section}{1}{\z@}{24pt plus 2pt minus 2pt}
+{12pt plus 2pt minus 2pt}{\large\bf}}
+
+%make subsection titles bold and 11 point, 1 blank line before, 1 after\texttt{}
+\def\subsection{\@startsection {subsection}{2}{\z@}{12pt plus 2pt minus 2pt}
+{12pt plus 2pt minus 2pt}{\subsize\bf}}
+\makeatother
+
+\begin{document}
+
+%don't want date printed
+\date{\today}
+
+\title{\Large\bf ПРОГРАММНОЕ ОБЕСПЕЧЕНИЕ ДЛЯ АНАЛИЗА ПРОИЗВОДИТЕЛЬНОСТИ КОМПЬЮТЕРНЫХ СЕТЕЙ ПРИ НАЛИЧИИ ПЕРЕГРУЗОК}
+ 
+%for two authors (this is what is printed)
+\author{\begin{tabular}[t]{c@{\extracolsep{8em}}c}
+  Карпухин А.В.	& Шаповалов Ю.А. \\
+ \\
+  каф. Информатики & \\
+  My Institute & Coauthor Institute \\
+  City, ST~~zipcode	& City, ST~~zipcode
+\end{tabular}}
+
+\maketitle
+
+
+%\subsection*{\centering Abstract}
+%IEEE allows italicized abstract
+{\em
+Возрастающий рост пользователей сети интернет делает всё более актуальной задачу обеспечения качества обслуживания. 
+Порядка 90-95 процентов информации передается с помощью стека протоколов TCP/IP. Как известно, благодаря многочисленным экспериментам и моделирования, трафик протокола TCP проявляет хаотическое поведение, и на больших масштабах обладает свойством самоподобия, то есть выглядит качественно одинаково при любых (достаточно больших) масштабах временной оси. Ввиду слабой прогнозируемости подобных процессов, сложно гарантировать стабильную работу протокола при высоких нагрузках, и соответственно определить максимальную пропускную способность. Методы расчёта пропускной способности основанные на Марковских моделях и формулах Эрланга, успешно применяемые для расчёта пропускной способности телефонных сетей, дают неоправданно оптимистические решения и приводят к недооценке нагрузки для TCP трафика. Различие между телефонной и компьютерной сетями заключается в способе коммутации. Для телефонных сетей используется коммутация каналов, при которых устанавливается соединение вида “точка-точка” между устройствами. Интернет сети ориентированны на коммутацию пакетов, благодаря которой через один физический канал может устанавливаться множество подключений. Так же такой способ коммутации не гарантирует что все пакеты следуют по одному и тому же маршруту, и промежуточные маршрутизаторы могут варьировать пути в зависимости от различных причин. Протокол TCP лишь отслеживает был ли доставлен пакет, или он был утерян.
+
+}
+
+\section{Причины возникновения хаоса}
+
+Распределение с Тяжелыми Хвостами размеров файлов, появления пакетов и длительности передачи вносят основной вклад в самоподобную природу агрегированного сетевого трафика
+В частности, даже если трафик , генерируемый приложениями, имеет параметр Херста H=0.5 ( т.е. является несамоподобным) TCP модулирует этот трафик и делает его самоподобным (имеющим параметр Херста H=1.0). Чем ближе этот параметр к единице, тем более ярко проявляются фрактальные свойства. Причем все существующие реализации протокола TCP  обладают этим «нежелательным» свойством.
+
+Методы профилирования сети для обнаружения хаотических поведений
+Для того чтобы иметь возможность определить проявляет ли траффик хаотичность, удобно использовать параметр Херста, как единицу измерения самоподобия стохастического процесса
+Кроме параметра Херста, самоподобным процессам присущи следующие свойства:
+Медленно убывающая дисперсия: При усреднении процесса, дисперсия выборочного среднего затухает медленнее, чем величина, обратная размеру выборки по закону
+ , при  , и  
+в то время как для традиционных стационарных случайных процессов
+ 
+т.е. уменьшается обратно пропорционально объему выборки.
+Свойство медленно убывающей дисперсии говорит о возможности существенных, не сглаживаемых усреднением, «выбросов» в случайном процессе, и связывает самоподобие с таким понятием, как распределения с тяжелыми хвостами.
+Долговременные зависимости: Самоподобные процессы обладают гиперболически затухающим коэффициентом корреляции вида  , или, для ассимптотически самоподобных процессов, корреляционная функцией  , при  , где L(t) – медленно меняющаяся функция на бесконечности (т.е.   для всех x > 0). Следовательно, корреляционная функция является несуммируемой – ряд, образованный последовательными значениями корреляционной функции, расходится. Это свойство характеризует практически все самоподобные процессы и отличает их от процессов без долговременной зависимости, у которых корреляционная функция убывает по показательному закону и суммируема.
+1/f шум (фликкер шум): спектральная плотность   подчиняется степенному закону в окрестности нуля, т.е.  , при  , и  , где  
+В качестве исследуемых данных используется выборка сетевого трафика как на конечных (хостовых) устройствах, так и на сетевых маршрутизаторах, которые были получены в ходе эксперимента.
+
+
+\subsection{Previous Work}
+In subsections there is 1 blank line before the section heading and one 
+afterwards.  Heading text is 11 point bold font.  Paragraphs are separated by 
+blank lines without tabs.
+
+Throughout I may cite references of the form \cite{key:foo} or
+\cite{foo:baz}, and LaTeX will keep track of numbering.  The numbers are based
+on the order you place them in the bibliography, not the order they appear in
+the text.  They should (I believe) be in alphabetical order.  LaTex will put
+square brackets about the number within the text of your paper.  For those of 
+you new to the bibliography package, you may have to run the latex process 
+twice to allow all references to be resolved.  You will get a warning about
+a missing .aux file.  Just rerun latex and it will be ok.
+
+\section{Summary and Conclusions}
+This template will get you through the minimum article, i.e. no figures or
+equations.  To include those, please refer to your LaTeX manual and the IEEE
+publications guidelines.  Good Luck!
+
+%this is how to do an unnumbered subsection
+\subsection*{Acknowledgements}
+This is how to do an unnumbered subsection, which comes out in 11 point bold
+font.  Here I thank my colleagues, especially Mike Gennert, who know more 
+about Tex and LaTeX than I.
+
+\begin{thebibliography}{9}
+
+\bibitem{key:foo}
+I. M. Author, 
+``Some Related Article I Wrote,''
+{\em Some Fine Journal}, Vol. 17, pp. 1-100, 1987.
+
+\bibitem{foo:baz}
+A. N. Expert, 
+{\em A Book He Wrote,}
+His Publisher, 1989.
+
+\end{thebibliography}
+
+\end{document}
